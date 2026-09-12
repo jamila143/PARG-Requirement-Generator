@@ -222,3 +222,17 @@ def history_export_xlsx():
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=parg_history_export.xlsx"},
     )
+
+
+# ── Serve the built frontend from this same server (single deployed URL) ──
+# Only active when frontend/dist actually exists (i.e. `npm run build` was
+# run and the result was copied next to this file -- see the Dockerfile and
+# README Section 12). In local development (npm run dev on :5173), this
+# folder won't exist, so this block does nothing and the two servers run
+# separately as normal -- nothing about local dev changes.
+import os
+from fastapi.staticfiles import StaticFiles
+
+_frontend_dist = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend_dist")
+if os.path.isdir(_frontend_dist):
+    app.mount("/", StaticFiles(directory=_frontend_dist, html=True), name="frontend")

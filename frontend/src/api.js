@@ -1,4 +1,9 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// When the frontend is served BY the same backend (as it is once deployed --
+// see Section 12 of the README), the API lives at the same origin as the
+// page itself, so an empty string ("" -> relative URLs like "/generate")
+// is the right default. VITE_API_URL still overrides this for local
+// development, where the frontend (5173) and backend (8000) are separate.
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 export async function checkHealth() {
   const res = await fetch(`${API_URL}/health`)

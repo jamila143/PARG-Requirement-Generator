@@ -1,23 +1,14 @@
-import { useEffect, useState } from 'react'
-import InputPanel from './components/InputPanel.jsx'
-import PipelineStepper from './components/PipelineStepper.jsx'
-import ProcessAnalysis from './components/ProcessAnalysis.jsx'
-import ScoringPanel from './components/ScoringPanel.jsx'
-import RequirementsList from './components/RequirementsList.jsx'
-import ValidationPanel from './components/ValidationPanel.jsx'
+import { useEffect, useRef, useState } from 'react'
 import HistoryPanel from './components/HistoryPanel.jsx'
 import { checkHealth, generateRequirements } from './api.js'
 
 export default function App() {
-  const [tab, setTab] = useState('generate') // 'generate' | 'history'
-  const [story, setStory] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [warning, setWarning] = useState(null)
-  const [result, setResult] = useState(null)
-  const [viewingHistory, setViewingHistory] = useState(false)
+  const [tab, setTab] = useState('chat') // 'chat' | 'history'
+  const [messages, setMessages] = useState([]) // [{id, story, status, result, error}]
+  const [input, setInput] = useState('')
+  const [sending, setSending] = useState(false)
   const [backend, setBackend] = useState({ checked: false, ready: false, detail: '' })
-  const [copied, setCopied] = useState(false)
+  const scrollRef = useRef(null)
 
   useEffect(() => {
     checkHealth()
@@ -28,82 +19,49 @@ export default function App() {
           detail:
             h.status === 'ready'
               ? `${h.num_process_concepts} process concepts loaded on ${h.device}`
-              : 'Models or dataset not loaded yet — see backend terminal output.',
+              : h.error || 'Models or dataset not loaded yet.',
         })
       })
-      .catch(() => {
-        setBackend({ checked: true, ready: false, detail: 'Cannot reach the backend at all.' })
-      })
+      .catch(() => setBackend({ checked: true, ready: false, detail: 'Cannot reach the backend.' }))
   }, [])
 
-  async function handleGenerate() {
-    setWarning(null)
-    setError(null)
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+  }, [messages, sending])
 
-    if (!story.trim()) {
-      setWarning('Please enter a user story before generating requirements.')
-      return
-    }
+  async function handleSend() {
+    const story = input.trim()
+    if (!story || sending) return
 
-    setLoading(true)
-    setResult(null)
-    setViewingHistory(false)
+    const id = Date.now()
+    setMessages((prev) => [...prev, { id, story, status: 'loading', result: null, error: null }])
+    setInput('')
+    setSending(true)
+
     try {
-      const data = await generateRequirements(story)
-      setResult(data)
+      const result = await generateRequirements(story)
+      setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, status: 'done', result } : m)))
     } catch (e) {
-      setError(e.message || 'Something went wrong while generating requirements.')
+      setMessages((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, status: 'error', error: e.message || 'Something went wrong.' } : m))
+      )
     } finally {
-      setLoading(false)
+      setSending(false)
     }
   }
 
-  function handleClear() {
-    setStory('')
-    setResult(null)
-    setError(null)
-    setWarning(null)
-    setViewingHistory(false)
+  function handleKeyDown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
   }
 
   function handleViewHistoryEntry(entry) {
-    setStory(entry.user_story)
-    setResult(entry)
-    setViewingHistory(true)
-    setTab('generate')
-    setError(null)
-    setWarning(null)
+    const id = Date.now()
+    setMessages((prev) => [...prev, { id, story: entry.user_story, status: 'done', result: entry, error: null }])
+    setTab('chat')
   }
-
-  function handleCopy() {
-    if (!result) return
-    const text = result.requirements.map((r, i) => `${i + 1}. ${r.text}`).join('\n')
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1800)
-    })
-  }
-
-  function handleDownload() {
-    if (!result) return
-    const text = [
-      `PARG Generated Requirements`,
-      `User story: ${result.user_story}`,
-      `Process concept: ${result.process_concept}`,
-      `Ontology mapping: ${result.ontology_mapping}`,
-      '',
-      ...result.requirements.map((r, i) => `${i + 1}. ${r.text}`),
-    ].join('\n')
-    const blob = new Blob([text], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'parg-requirements.txt'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  const pipelineStatus = loading ? 'running' : result ? 'done' : 'idle'
 
   return (
     <div className="app-shell">
@@ -112,7 +70,7 @@ export default function App() {
           <span className="brand-mark">PARG</span>
           <div className="brand-text">
             <h1>Process-Aware Requirement Generation</h1>
-            <p>Turn one user story into structured, ontology-grounded software requirements.</p>
+            <p>Ask for requirements, story by story — keep going as long as you like.</p>
           </div>
         </div>
         {backend.checked && (
@@ -122,93 +80,101 @@ export default function App() {
             <span className="backend-detail">{backend.detail}</span>
           </div>
         )}
-      </header>
-
-      <main className="app-main">
-        <div className="tab-row">
-          <button
-            className={`tab-btn ${tab === 'generate' ? 'tab-btn-active' : ''}`}
-            onClick={() => setTab('generate')}
-          >
-            Generate
+        <div className="tab-row tab-row-header">
+          <button className={`tab-btn ${tab === 'chat' ? 'tab-btn-active' : ''}`} onClick={() => setTab('chat')}>
+            Chat
           </button>
-          <button
-            className={`tab-btn ${tab === 'history' ? 'tab-btn-active' : ''}`}
-            onClick={() => setTab('history')}
-          >
+          <button className={`tab-btn ${tab === 'history' ? 'tab-btn-active' : ''}`} onClick={() => setTab('history')}>
             History
           </button>
         </div>
+      </header>
 
-        {tab === 'history' && <HistoryPanel onViewEntry={handleViewHistoryEntry} />}
+      {tab === 'history' && (
+        <main className="app-main">
+          <HistoryPanel onViewEntry={handleViewHistoryEntry} />
+        </main>
+      )}
 
-        {tab === 'generate' && (
-          <>
-            <PipelineStepper status={pipelineStatus} />
-
-            <InputPanel
-              value={story}
-              onChange={setStory}
-              onGenerate={handleGenerate}
-              onClear={handleClear}
-              loading={loading}
-              disabled={backend.checked && !backend.ready}
-            />
-
-            {warning && <div className="banner banner-warn">{warning}</div>}
-            {error && <div className="banner banner-error">{error}</div>}
+      {tab === 'chat' && (
+        <div className="chat-shell">
+          <div className="chat-scroll" ref={scrollRef}>
+            {messages.length === 0 && (
+              <div className="chat-empty">
+                <p>Type a user story below and press Enter.</p>
+                <p className="chat-empty-example">
+                  e.g. "As a bank customer, I want to transfer money online so that I can pay my bills conveniently."
+                </p>
+              </div>
+            )}
+            {messages.map((m) => (
+              <ChatTurn key={m.id} message={m} />
+            ))}
             {backend.checked && !backend.ready && (
-              <div className="banner banner-warn">
-                The backend says it isn't ready ({backend.detail}). Generate will not work until
-                the model and dataset files are in place — see the README.
+              <div className="banner banner-warn chat-banner">
+                Backend isn't ready ({backend.detail}). Requests will fail until the model/dataset files are in place.
               </div>
             )}
+          </div>
 
-            {loading && (
-              <div className="loading-block">
-                <div className="spinner" />
-                <span>Running the PARG pipeline…</span>
-              </div>
-            )}
+          <div className="chat-input-bar">
+            <textarea
+              className="chat-input"
+              placeholder="Enter a user story…"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={2}
+              disabled={sending}
+            />
+            <button className="btn btn-primary chat-send-btn" onClick={handleSend} disabled={sending || !input.trim()}>
+              {sending ? '…' : 'Send'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
-            {result && !loading && (
-              <>
-                {viewingHistory && (
-                  <div className="banner banner-info">
-                    Viewing a saved result from history ({new Date(result.created_at).toLocaleString()}).
-                  </div>
-                )}
-                {!viewingHistory && result.history_id && (
-                  <div className="banner banner-info">Saved to history (#{result.history_id}).</div>
-                )}
-                {result.warnings.length > 0 && (
-                  <div className="banner banner-warn">
-                    <strong>Review before trusting this result:</strong>
-                    <ul className="warning-list">
-                      {result.warnings.map((w, i) => (
-                        <li key={i}>{w}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <ProcessAnalysis result={result} />
-                <ScoringPanel scoring={result.scoring} />
-                <RequirementsList
-                  requirements={result.requirements}
-                  onCopy={handleCopy}
-                  onDownload={handleDownload}
-                />
-                <ValidationPanel validation={result.validation} />
-                {copied && <div className="toast">Copied to clipboard</div>}
-              </>
-            )}
+function ChatTurn({ message }) {
+  const { story, status, result, error } = message
+
+  function handleCopy() {
+    if (!result) return
+    const text = result.requirements.map((r, i) => `${i + 1}. ${r.text}`).join('\n')
+    navigator.clipboard.writeText(text)
+  }
+
+  return (
+    <div className="chat-turn">
+      <div className="chat-bubble chat-bubble-user">{story}</div>
+
+      <div className="chat-bubble chat-bubble-assistant">
+        {status === 'loading' && (
+          <div className="chat-loading">
+            <div className="spinner" />
+            <span>Generating…</span>
+          </div>
+        )}
+
+        {status === 'error' && <div className="chat-error">{error}</div>}
+
+        {status === 'done' && result && (
+          <>
+            <ol className="chat-req-list">
+              {result.requirements.map((r, i) => (
+                <li key={i}>
+                  {r.text}
+                </li>
+              ))}
+            </ol>
+            <button className="chat-copy-btn" onClick={handleCopy}>
+              Copy
+            </button>
           </>
         )}
-      </main>
-
-      <footer className="app-footer">
-        <span>PARG research demonstration — not a general-purpose chat assistant.</span>
-      </footer>
+      </div>
     </div>
   )
 }
