@@ -24,7 +24,6 @@ The application uses the trained PARG models and dataset. It does not use fake o
 
 ## 2. Complete folder structure
 
-You already have all of this — it was generated for you. Here is what everything is:
 
 ```
 parg-ui/
