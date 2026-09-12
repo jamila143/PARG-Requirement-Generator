@@ -102,13 +102,3 @@ As a bank customer, I want to transfer money online so that I can pay my bills c
 ```
 
 Output includes: detected process concept (e.g. `FundsTransferProcess`), ontology mapping (`Banking → PaymentSubDomain → FundsTransferProcess`), extracted actor/action/condition/outcome, model confidence / ontology similarity / hybrid score, generated requirements, and validation results (duplicate check, ambiguous-term check, coverage check).
-
-## 8. Troubleshooting
-
-| Issue | Cause / Fix |
-|---|---|
-| "Backend not ready" | Check `backend/models/` (both `.pt` files) and `backend/data/` (`.xlsx`) are present |
-| Classifier checkpoint mismatch error | `backend/data/` dataset differs from the one used for training; use the exact training file |
-| CORS error | Confirm backend runs on port 8000 and `frontend/.env` has `VITE_API_URL=http://localhost:8000` |
-| Port already in use | Free the port or run with `--port 8001` and update `frontend/.env` accordingly |
-| `pip install` fails on `torch` | Install a CPU-only build from [pytorch.org/get-started](https://pytorch.org/get-started/locally/), then re-run `pip install -r requirements.txt` |
