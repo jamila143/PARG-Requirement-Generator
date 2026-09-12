@@ -96,8 +96,6 @@ Everything needed by the UI comes from your existing PARG notebook and trained m
 | Requirement generation | Cell 12's template logic — ported into `backend/app/ontology.py` |
 | Validation / coverage | Cell 13's duplicate + coverage checks — reimplemented per-request in `backend/app/pipeline.py` |
 
-Nothing was missing, so nothing here is a stand-in implementation — it's your pipeline's own
-logic, reused.
 
 **One design choice worth knowing about:** Algorithm A1's hybrid score is *reported* next to the
 model's prediction, but it does **not** override which process concept gets selected — the
