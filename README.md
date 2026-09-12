@@ -106,7 +106,7 @@ npm run dev
 Open `http://localhost:5173`. A "Backend ready" badge confirms the backend health check (`http://localhost:8000/health`) succeeded.
 
 ## 7. Example
->>>>>>> 0bf9d01a98aa4146fd073128646ce2561e9a11c0
+
 
 Input:
 ```
