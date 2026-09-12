@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # PARG Requirement Generation — Web UI
 
 This is a web interface around your existing PARG pipeline (the models and dataset from
@@ -319,3 +320,7 @@ scores, generated requirements, everything, exactly as it looked the first time.
   ```
 - To start over with an empty history, just delete `backend/parg_history.db` while the server
   is stopped — a fresh one will be created next time you start it.
+=======
+# PARG-Requirement-Generator
+An NLP-based Process-Aware Requirement Generation system
+>>>>>>> f97ae06f10b2fefacd035ccd0331b4e2898e03db
