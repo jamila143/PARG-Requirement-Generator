@@ -114,13 +114,13 @@ As a bank customer, I want to transfer money online so that I can pay my bills c
 ```
 
 **Output:**
-
+```
 1. The system shall initiate the workflow associated with money online.
 2. The system shall validate money online against the required business rules and return a pass or fail result.
 3. The system shall check the bank customer's permissions before authorizing the operation on money online.
 4. The system shall process money online on behalf of the bank customer and confirm the outcome.
 5. The system shall send a notification about money online to the relevant stakeholders.
-
+```
 ## Folder structure
 
 ```
