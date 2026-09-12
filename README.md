@@ -186,4 +186,3 @@ Output includes: detected process concept (e.g. `FundsTransferProcess`), ontolog
 | CORS error | Confirm backend runs on port 8000 and `frontend/.env` has `VITE_API_URL=http://localhost:8000` |
 | Port already in use | Free the port or run with `--port 8001` and update `frontend/.env` accordingly |
 | `pip install` fails on `torch` | Install a CPU-only build from [pytorch.org/get-started](https://pytorch.org/get-started/locally/), then re-run `pip install -r requirements.txt` |
->>>>>>> 0bf9d01a98aa4146fd073128646ce2561e9a11c0
