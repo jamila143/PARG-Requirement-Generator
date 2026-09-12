@@ -1,14 +1,12 @@
-<<<<<<< HEAD
 # PARG Requirement Generation — Web UI
 
-This is a web interface around your existing PARG pipeline (the models and dataset from
-`PARG_Kaggle_Pipeline_v6.ipynb`). You type in one user story, and it runs the real PARG
-pipeline — preprocessing → process classification → ontology mapping → NER extraction →
-Algorithm A1 hybrid scoring → requirement generation → validation — and shows you the result.
+A web application for the **PARG (Process-Aware Requirement Generation)** pipeline.
 
-**Nothing in this app is hard-coded.** The process concept, ontology mapping, scores, and
-generated requirements all come from your actual trained models and dataset. If a model file
-is missing, the app tells you exactly that — it does not fall back to fake data.
+Enter a user story and the app performs:
+
+**Preprocessing → Process Classification → Ontology Mapping → NER Extraction → Algorithm A1 Scoring → Requirement Generation → Validation**
+
+The application uses the trained PARG models and dataset. It does not use fake or hard-coded prediction results.
 
 ## What changed in this revision (reliability pass)
 
@@ -91,7 +89,24 @@ parg-ui/
             └── ValidationPanel.jsx
 ```
 
-## 3. Where your existing PARG code goes
+## 4. Download the trained models
+
+The app needs two trained model files. You can download them from Google Drive:
+
+- **NER model:** [Download NER model](https://drive.google.com/file/d/1jeuA_6PRuqWpEHu7hkudMuH8u_GreWEr/view?usp=sharing)
+- **Process classifier:** [Download Process Classifier](https://drive.google.com/file/d/1Dqhwd-vBcWhCSs0D4gQVOsuYhHBZxbjx/view?usp=sharing)
+
+After downloading, place the files in:
+
+```text
+backend/models/
+├── ner_model_state_dict.pt
+└── classifier_model_state_dict.pt
+```
+
+> Rename the downloaded files to the exact names above if they have different names.
+
+## 4. Where your existing PARG code goes
 
 Your PARG pipeline lives in `PARG_Kaggle_Pipeline_v6.ipynb`, which you run on Kaggle (it needs
 a GPU to train). This app does **not** retrain anything — it loads the two files Kaggle's
@@ -117,9 +132,9 @@ is fast enough to run on a normal laptop CPU.
 That's it — `backend/app/pipeline.py` does the loading and inference. You do not need to write
 or change any model code yourself.
 
-### If a component is missing
+### What the application uses
 
-I inspected the notebook you built. Everything the UI needs already exists in it:
+Everything needed by the UI comes from your existing PARG notebook and trained models:
 
 | UI needs | Comes from |
 |---|---|
@@ -143,7 +158,7 @@ points (a single story's ontology-similarity score turned out to be a much noisi
 the classifier's own confidence). Showing both scores honestly, without letting the noisier one
 silently override the trained model, is the safer design your own experiment pointed to.
 
-## 4. How the frontend talks to the backend
+## 5. How the frontend talks to the backend
 
 The React app runs at `http://localhost:5173` (Vite's default). The Python API runs at
 `http://localhost:8000` (FastAPI's default with the command below). When you click **Generate
@@ -155,7 +170,7 @@ This only works because the backend explicitly allows the frontend's address to 
 for `CORSMiddleware` in `backend/app/main.py` — CORS is a browser security rule that blocks
 requests between different addresses unless the server says it's OK).
 
-## 5. Installing everything
+## 6. Installing everything
 
 You need **Python 3.10+** and **Node.js 18+** installed on your computer first. If you don't have
 them: Python from [python.org](https://www.python.org/downloads/), Node.js from
@@ -203,7 +218,7 @@ cp .env.example .env
 
 (`cp` is Mac/Linux; on Windows PowerShell use `copy .env.example .env`.)
 
-## 6. Exact commands to start everything
+## 7. Exact commands to start everything
 
 **Terminal 1 — backend** (from inside `parg-ui/backend`, with the virtual environment active):
 
@@ -223,7 +238,7 @@ npm run dev
 
 You'll see a line like `Local: http://localhost:5173/`.
 
-## 7. What URL to open
+## 8. What URL to open
 
 Open your browser to:
 
@@ -235,7 +250,7 @@ You should see the PARG interface with a "Backend ready" badge at the top if bot
 started correctly (it checks `http://localhost:8000/health` automatically). If it says "Backend
 not ready," re-check step 3 (model/dataset files) and look at Terminal 1 for the exact error.
 
-## 8. Testing it with one sample story
+## 9. Testing it with one sample story
 
 Paste this into the text area:
 
@@ -255,7 +270,7 @@ Click **Generate Requirements**. Within a few seconds you should see:
 Try the **Copy requirements** and **Download .txt** buttons, and try clicking **Generate** with
 an empty box to see the warning message.
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 - **"Backend not ready" / red badge**: Terminal 1 will show why. Almost always it's a missing
   file — re-check `backend/models/` has both `.pt` files and `backend/data/` has your `.xlsx`.
@@ -270,7 +285,7 @@ an empty box to see the warning message.
   see [pytorch.org/get-started](https://pytorch.org/get-started/locally/) for the exact command
   for your OS, then re-run `pip install -r requirements.txt` for the rest.
 
-## 10. Applying this update if you already have it running
+## 11. Applying this update if you already have it running
 
 Nothing about your trained models or dataset changed — only the backend's inference code
 (`backend/app/pipeline.py`, `schemas.py`, `main.py`) and the frontend display components. If
@@ -286,7 +301,7 @@ you already had the app running:
 
 No retraining, no new model files, no dataset changes required.
 
-## 11. History (every submission is saved automatically)
+## 12. History (every submission is saved automatically)
 
 Every time you click **Generate Requirements**, the full result — the story, the extracted
 actor/action/condition/outcome, the scores, every generated requirement, and the validation
@@ -321,7 +336,7 @@ scores, generated requirements, everything, exactly as it looked the first time.
 - To start over with an empty history, just delete `backend/parg_history.db` while the server
   is stopped — a fresh one will be created next time you start it.
 
-## 12. Deploying a real public link (Hugging Face Spaces)
+## 13. Deploying a real public link (Hugging Face Spaces)
 
 This turns your local-only app into a single public URL anyone can open directly — no terminal,
 no localhost, works from any device.
