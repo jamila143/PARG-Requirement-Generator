@@ -63,16 +63,14 @@ parg-ui/
 - Python 3.10+
 - Node.js 18+ (with npm)
 
-## 5. Model and Dataset Files
+## 5. Model 
 
 Download the trained checkpoints and place them in `backend/models/` using the exact filenames:
 
 - [NER model](https://drive.google.com/file/d/1jeuA_6PRuqWpEHu7hkudMuH8u_GreWEr/view?usp=sharing) → `ner_model_state_dict.pt`
 - [Process classifier](https://drive.google.com/file/d/1Dqhwd-vBcWhCSs0D4gQVOsuYhHBZxbjx/view?usp=sharing) → `classifier_model_state_dict.pt`
 
-Ensure `backend/data/PARG_Dataset_v8.xlsx` is present and matches the exact dataset version used during training — a mismatched dataset will cause a classifier checkpoint error.
 
-## 6. Setup
 
 **Backend**
 ```bash
