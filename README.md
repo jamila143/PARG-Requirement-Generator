@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # PARG — Process-Aware Requirement Generation
 
 A web app that turns a single agile user story into structured, IEEE-830 software requirements,
@@ -113,7 +113,6 @@ Input:
 As a bank customer, I want to transfer money online so that I can pay my bills conveniently.
 ```
 
-<<<<<<< HEAD
 **Output:**
 
 - Detected process concept (e.g. `FundsTransferProcess`) and its ontology mapping
