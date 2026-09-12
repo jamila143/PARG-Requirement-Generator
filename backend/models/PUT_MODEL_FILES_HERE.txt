@@ -1,7 +1,0 @@
-Put these two files here, exported by Cell 20 of PARG_Kaggle_Pipeline_v6.ipynb
-(they appear in Kaggle's Output tab / parg_outputs/ folder after a run):
-
-  ner_model_state_dict.pt
-  classifier_model_state_dict.pt
-
-Nothing else goes in this folder.
