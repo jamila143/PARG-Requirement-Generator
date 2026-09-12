@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # PARG Requirement Generation — Web UI
 
 This is a web interface around your existing PARG pipeline (the models and dataset from
@@ -381,3 +382,6 @@ container serving both from a single URL — you don't need to host them separat
 - This is separate from your GitHub repo (Section 3) — the GitHub repo is your public *source
   code* (without the large model files, per its `.gitignore`); the Hugging Face Space is the
   *running app* (with the model files, since Spaces support them via Git LFS).
+=======
+
+>>>>>>> a4727731ade4a0fd092022c020cee367c6608bb3
