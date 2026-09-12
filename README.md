@@ -81,30 +81,6 @@ backend/models/
 
 
 
-### What the application uses
-
-Everything needed by the UI comes from your existing PARG notebook and trained models:
-
-| UI needs | Comes from |
-|---|---|
-| Preprocessing | Cell 5's `preprocess()` — ported into `backend/app/nlp_utils.py` |
-| Process classifier | Cell 10's trained `BertForSequenceClassification` — loaded from your `.pt` file |
-| Process labels | Cell 7's label list — rebuilt in `backend/app/ontology.py` from your dataset |
-| Ontology mapping | Cell 4's ontology dict — rebuilt from your dataset |
-| NER (actor/action/condition/outcome) | Cell 8's trained `BertForTokenClassification` — loaded from your `.pt` file |
-| Algorithm A1 (α, β, θ) | Cell 11 — reimplemented in `backend/app/pipeline.py` using **your specified formula**, `Hybrid = 0.55 × confidence + 0.45 × similarity` |
-| Requirement generation | Cell 12's template logic — ported into `backend/app/ontology.py` |
-| Validation / coverage | Cell 13's duplicate + coverage checks — reimplemented per-request in `backend/app/pipeline.py` |
-
-
-**One design choice worth knowing about:** Algorithm A1's hybrid score is *reported* next to the
-model's prediction, but it does **not** override which process concept gets selected — the
-classifier's own top-1 prediction is always used. This is because an earlier version of your
-notebook tried using the hybrid score to switch predictions and it reduced accuracy by about 40
-points (a single story's ontology-similarity score turned out to be a much noisier signal than
-the classifier's own confidence). Showing both scores honestly, without letting the noisier one
-silently override the trained model, is the safer design your own experiment pointed to.
-
 ## 5. How the frontend talks to the backend
 
 The React app runs at `http://localhost:5173` (Vite's default). The Python API runs at
