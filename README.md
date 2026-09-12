@@ -63,14 +63,16 @@ parg-ui/
 - Python 3.10+
 - Node.js 18+ (with npm)
 
-## 5. Model 
+## 5. Model and Dataset Files
 
 Download the trained checkpoints and place them in `backend/models/` using the exact filenames:
 
 - [NER model](https://drive.google.com/file/d/1jeuA_6PRuqWpEHu7hkudMuH8u_GreWEr/view?usp=sharing) → `ner_model_state_dict.pt`
 - [Process classifier](https://drive.google.com/file/d/1Dqhwd-vBcWhCSs0D4gQVOsuYhHBZxbjx/view?usp=sharing) → `classifier_model_state_dict.pt`
 
+Ensure `backend/data/PARG_Dataset_v8.xlsx` is present and matches the exact dataset version used during training — a mismatched dataset will cause a classifier checkpoint error.
 
+## 6. Setup
 
 **Backend**
 ```bash
@@ -129,10 +131,18 @@ As a bank customer, I want to transfer money online so that I can pay my bills c
   ```
 - Validation results: duplicate check, ambiguous-term check, coverage check
 
-## 9. Technologies Used
+## 9. Troubleshooting
+
+| Issue | Cause / Fix |
+|---|---|
+| "Backend not ready" | Check `backend/models/` (both `.pt` files) and `backend/data/` (`.xlsx`) are present |
+| Classifier checkpoint mismatch error | `backend/data/` dataset differs from the one used for training; use the exact training file |
+| CORS error | Confirm backend runs on port 8000 and `frontend/.env` has `VITE_API_URL=http://localhost:8000` |
+| Port already in use | Free the port or run with `--port 8001` and update `frontend/.env` accordingly |
+| `pip install` fails on `torch` | Install a CPU-only build from [pytorch.org/get-started](https://pytorch.org/get-started/locally/), then re-run `pip install -r requirements.txt` |
+
+## 10. Technologies Used
 
 - **Backend:** Python, FastAPI, PyTorch, Hugging Face Transformers, BERT
 - **Frontend:** React, Vite, JavaScript, CSS
 - **NLP/AI:** BERT-based process classification and NER, sentence embeddings, ontology mapping, hybrid scoring, automated requirement generation and validation
-  
-# 10. Troubleshooting | Problem | Possible Solution ||---|---|| **Backend not ready** | Make sure both `.pt` model files are inside `backend/models/` and the dataset is inside `backend/data/`. || **Classifier checkpoint mismatch** | Make sure you are using the correct `PARG_Dataset_v8.xlsx` file used during training. || **CORS error** | Make sure the backend is running on port `8000` and `VITE_API_URL=http://localhost:8000` is set in `.env`. || **Port already in use** | Stop the process using the port or run the backend on another port, such as `8001`. || **Frontend cannot connect to backend** | Check that the FastAPI backend is running and that `VITE_API_URL` points to the correct backend URL. || **`pip install` fails for PyTorch** | Install a compatible CPU-only PyTorch build from [PyTorch](https://pytorch.org/get-started/locally/), then run `pip install -r requirements.txt` again. | ---
