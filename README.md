@@ -8,33 +8,7 @@ Enter a user story and the app performs:
 
 The application uses the trained PARG models and dataset. It does not use fake or hard-coded prediction results.
 
-## What changed in this revision (reliability pass)
 
-You reported inconsistent extraction quality across different story types. Two of those were
-real bugs, now fixed, and the rest are now handled by being explicit instead of silent:
-
-- **Fixed a real span-extraction bug**: the NER span decoder used to collect *every* word
-  anywhere in the sentence tagged with a given label and join them together. If the model
-  mistagged one stray, non-adjacent word with the same label, it got glued onto the real span —
-  that was your "mixing parts of the sentence" symptom. It now decodes proper contiguous BIO
-  runs and keeps the longest one, ignoring stray fragments elsewhere in the sentence.
-- **Per-span confidence + quality gates**: each extracted actor/action/condition/outcome now
-  carries the model's own confidence. Condition/outcome spans below a confidence threshold, or
-  shorter than 2 tokens, are treated as unreliable and excluded from the generated requirement
-  text rather than stitched in as a garbled fragment.
-- **Low-confidence process predictions are now flagged, not hidden**: if the classifier's
-  confidence is below the threshold, the process concept is marked "tentative" in the UI and a
-  top-level warning is shown, instead of presenting an uncertain guess as a settled fact.
-- **Expanded post-generation validation**: beyond duplicate and ambiguous-term checks, it now
-  runs a grammar check (sentence structure, repeated words, double spaces, length sanity), a
-  semantic-relevance check (does the requirement actually reference the extracted entity?), and
-  a traceability check (does every generated step's verb genuinely belong to that process
-  concept's own ontology template?). Every issue found is listed specifically, not just a
-  pass/fail flag.
-- **Session coverage vs. Algorithm A2 coverage are now explicitly distinguished** in both the
-  API response and the UI text — the running "concepts touched this session" counter was never
-  the notebook's full-dataset coverage metric, and the wording now says so directly instead of
-  letting the two be confused.
 
 ## 1. What technology this uses
 
