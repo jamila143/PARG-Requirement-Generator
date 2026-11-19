@@ -96,7 +96,7 @@ Download the trained checkpoints and place them in `backend/models/` using the e
 - NER model → `ner_model_state_dict.pt`
 - Process classifier → `classifier_model_state_dict.pt`
 
-Ensure `backend/data/PARG_Dataset_v8.xlsx` (see Section 5 for the link) is present and matches the exact dataset version used during training — **a mismatched dataset will cause a classifier checkpoint error.**
+Ensure `backend/data/PARG_Dataset_Final.xlsx` (see Section 5 for the link) is present and matches the exact dataset version used during training — **a mismatched dataset will cause a classifier checkpoint error.**
 
 ---
 
