@@ -85,7 +85,7 @@ PARG is trained and validated on two separate spreadsheets. Both must be referen
 | **Main training dataset** (`PARG_Dataset_v8.xlsx`) | The source corpus the NER model and process classifier are trained, validated, and tested on. This is the file that must be placed in `backend/data/`. | [Open in Google Sheets](https://docs.google.com/spreadsheets/d/1ga7fO2jz31HtORJQlQRWrDNjG2eTqVHfBRlEIFyqG1Y/edit?usp=sharing) |
 | **Expert validation dataset** | The separate review cohort used for independent human expert validation of the *generated* requirements (precision/recall/F1 reported in the paper). Not used for training. | [Open in Google Sheets](https://docs.google.com/spreadsheets/d/1Fha33LR5f4oN4HQPSpGtlTRybMZD0rEfiu8mKxvdRbU/edit?usp=sharing) |
 
-> Download the main training dataset as `.xlsx` and place it at `backend/data/PARG_Dataset_Final.xlsx` before starting the backend (see Section 6/7). The expert validation dataset is only needed if you are reproducing the human-validation evaluation, not for running the app itself.
+> Download the main training dataset as `.xlsx` and place it at `backend/data/PARG_Dataset_Final.xlsx` before starting the backend (see Section 6/7).
 
 ---
 
